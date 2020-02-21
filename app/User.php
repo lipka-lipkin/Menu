@@ -37,4 +37,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function makeToken()
+    {
+        $this->token = $this->createToken('authToken')->accessToken;
+        return $this;
+    }
 }
