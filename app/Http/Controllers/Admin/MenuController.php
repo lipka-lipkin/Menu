@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Menu\StoreMenuRequest;
-use App\Http\Requests\Api\Menu\UpdateMenuRequest;
-use App\Http\Resources\Api\MenuResource;
+use App\Http\Requests\Admin\Menu\IndexMenuRequest;
+use App\Http\Requests\Admin\Menu\StoreMenuRequest;
+use App\Http\Requests\Admin\Menu\UpdateMenuRequest;
+use App\Http\Resources\Admin\MenuResource;
 use App\Menu;
-use App\Dish;
 use Exception;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -16,11 +16,24 @@ class MenuController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param IndexMenuRequest $request
      * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(IndexMenuRequest $request)
     {
-        $menu = Menu::query()->latest()->paginate();
+        $search = $request->search;
+        $menu = Menu::latest()
+            ->when($search, function ($query, $search) {
+                return $query->where('title', 'like', '%'.$search.'%');
+            })
+            ->when($request->from, function ($query, $from){
+                $query->where('created_at', '>=', $from);
+            })
+            ->when($request->to, function ($query, $to){
+                $query->where('created_at', '<=', $to);
+            })
+            ->paginate()->appends(['search' => $search])
+        ;
         return MenuResource::collection($menu);
     }
 
@@ -34,13 +47,13 @@ class MenuController extends Controller
     {
         $menu = Menu::create([
             'title' => $request->title,
-            'price' => $request->price
         ]);
-        $dishes = Dish::find($request->dishes);//
-        dd($dishes);
-        $menu->dishes()->attach($dishes, [//
-            'type' => $request->type//
-        ]);//
+        $attach = [];
+        foreach ($request->dishes as $dish)
+        {
+            $attach[] = $dish['id'];
+        }
+        $menu->dishes()->attach($attach);
         return MenuResource::make($menu->load('dishes'));
     }
 
@@ -52,7 +65,7 @@ class MenuController extends Controller
      */
     public function show(Menu $menu)
     {
-        return MenuResource::make($menu);
+        return MenuResource::make($menu->load('dishes'));
     }
 
     /**
@@ -66,15 +79,13 @@ class MenuController extends Controller
     {
         $menu->update([
             'title' => $request->title,
-            'price' => $request->price
         ]);
-        $dishes = Dish::find($request->dishes);
-        $menu->dishes()->detach();
-        $menu->dishes()->attach($dishes, [
-            'type' => $request->type
-        ]);
-//        [1,2]
-//        [1 => ['type' => $request->type], 2 => ['type' => $request->type2]]
+        $sync = [];
+        foreach ($request->dishes as $dish)
+        {
+            $sync[] = $dish['id'];
+        }
+        $menu->dishes()->sync($sync);
         return MenuResource::make($menu->load('dishes'));
     }
 

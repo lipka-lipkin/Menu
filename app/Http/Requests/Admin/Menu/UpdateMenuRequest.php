@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Api\Dish;
+namespace App\Http\Requests\Admin\Menu;
 
+use App\Menu;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreDishRequest extends FormRequest
+class UpdateMenuRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +27,13 @@ class StoreDishRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'quantity' => 'required|numeric',
-            'is_necessary' => 'required|boolean',
-            'ingredients' => 'required|array',
-            'ingredients.*' => 'required|array',
-            'ingredients.*.id' => 'required|integer'
+            'dishes' => 'required|array',
+            'dishes.*' => 'required|array',
+            'dishes.*.id' => [
+                'required',
+                'integer',
+                Rule::exists('dishes', 'id')
+            ],
         ];
     }
 }

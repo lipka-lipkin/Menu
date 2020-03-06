@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Api\Ingredient;
+namespace App\Http\Requests\Admin\Ingredient;
 
-use App\Ingredient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Ingredient;
 
-class UpdateIngredientRequest extends FormRequest
+class StoreIngredientRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,13 +27,11 @@ class UpdateIngredientRequest extends FormRequest
     {
         return [
             'title' => 'required|max:255',
-            'quantity' => 'required|numeric',
             'units' => [
                 'required',
-                'string',
                 Rule::in(Ingredient::$units)
             ],
-            'price' => 'required|numeric'
+            'price' => 'required|numeric|min:0.01|max:9999.99'//max and min
         ];
     }
 }

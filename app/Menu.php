@@ -8,7 +8,6 @@ class Menu extends Model
 {
     protected $fillable = [
         'title',
-        'price'
     ];
 
     public static $type = [

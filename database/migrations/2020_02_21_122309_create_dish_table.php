@@ -16,7 +16,8 @@ class CreateDishTable extends Migration
         Schema::create('dishes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title');
-            $table->float('price');
+            $table->decimal('price', 6, 2);
+            $table->string('type');
             $table->timestamps();
         });
     }

@@ -16,9 +16,8 @@ class CreateIngredientTable extends Migration
         Schema::create('ingredients', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title');
-            $table->integer('quantity');//
             $table->string('units');
-            $table->float('price');
+            $table->decimal('price', 6, 2);
             $table->timestamps();
         });
     }

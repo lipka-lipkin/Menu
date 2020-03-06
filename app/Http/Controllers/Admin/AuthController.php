@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\AuthLoginRequest;
-use App\Http\Requests\Api\Auth\AuthRegisterRequest;
-use App\Http\Resources\Api\UserResource;
+use App\Http\Requests\Admin\Auth\AuthLoginRequest;
+use App\Http\Requests\Admin\Auth\AuthRegisterRequest;
+use App\Http\Resources\Admin\UserResource;
 use App\User;
 
 class AuthController extends Controller
 {
-
     public function register(AuthRegisterRequest $request)
     {
         $user = User::create([

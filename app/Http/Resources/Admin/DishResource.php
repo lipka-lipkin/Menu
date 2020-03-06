@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Api;
+namespace App\Http\Resources\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MenuResource extends JsonResource
+class DishResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,7 +19,8 @@ class MenuResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'price' => $this->price,
-            'dishes' => DishResource::collection($this->whenLoaded('dishes')),
+            'type' => $this->type,
+            'ingredients' => IngredientResource::collection($this->whenLoaded('ingredients')),
             'created_at' => (string) $this->created_at,
             'updated_at' => (string) $this->updated_at
         ];

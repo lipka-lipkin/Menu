@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Ingredient\StoreIngredientRequest;
-use App\Http\Requests\Api\Ingredient\UpdateIngredientRequest;
-use App\Http\Resources\Api\IngredientResource;
+use App\Http\Requests\Admin\Ingredient\IndexIngredientRequest;
+use App\Http\Requests\Admin\Ingredient\StoreIngredientRequest;
+use App\Http\Requests\Admin\Ingredient\UpdateIngredientRequest;
+use App\Http\Resources\Admin\IngredientResource;
 use App\Ingredient;
 use Exception;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -15,11 +16,24 @@ class IngredientController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param IndexIngredientRequest $request
      * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(IndexIngredientRequest $request)
     {
-        $ingredients = Ingredient::query()->latest()->paginate();
+        $search = $request->search;
+        $ingredients = Ingredient::latest()
+            ->when($search, function ($query, $search){
+                $query->where('title', 'like', '%'.$search.'%');
+            })
+            ->when($request->from, function ($query, $from){
+                $query->where('created_at', '>=', $from);
+            })
+            ->when($request->to, function ($query, $to){
+                $query->where('created_at', '<=', $to);
+            })
+            ->paginate()->appends(['search' => $search])
+        ;
         return IngredientResource::collection($ingredients);
     }
 
@@ -33,7 +47,6 @@ class IngredientController extends Controller
     {
         $ingredient = Ingredient::create([
             'title' => $request->title,
-            'quantity' => $request->quantity,//
             'units' => $request->units,
             'price' => $request->price
         ]);
@@ -62,7 +75,6 @@ class IngredientController extends Controller
     {
         $ingredient->update([
             'title' => $request->title,
-            'quantity' => $request->quantity,
             'units' => $request->units,
             'price' => $request->price
         ]);
