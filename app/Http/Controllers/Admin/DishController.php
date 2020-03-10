@@ -9,10 +9,17 @@ use App\Http\Requests\Admin\Dish\StoreDishRequest;
 use App\Http\Requests\Admin\Dish\UpdateDishRequest;
 use App\Http\Resources\Admin\DishResource;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class DishController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Dish::class);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,20 +28,22 @@ class DishController extends Controller
      */
     public function index(IndexDishRequest $request)
     {
-        $search = $request->search;
-        $dishes = Dish::latest()
-            ->when($search, function ($query, $search){
-                $query->where('title', 'like', '%'.$search.'%');
-            })
-            ->when($request->from, function ($query, $from){
-                $query->where('created_at', '>=', $from);
-            })
-            ->when($request->to, function ($query, $to){
-                $query->where('created_at', '<=', $to);
-            })
-            ->paginate()->appends(['search' => $search])
-        ;
-        return DishResource::collection($dishes);
+        $cacheKey = 'dish.' .$request->page .'.'. $request->search .'.'.$request->from. '.'.$request->to;
+        return Cache::tags('dish')->remember($cacheKey, 5000, function () use ($request){
+            $dishes =  Dish::latest()
+                ->when($request->search, function ($query, $search){
+                    $query->where('title', 'like', '%'.$search.'%');
+                })
+                ->when($request->from, function ($query, $from){
+                    $query->where('created_at', '>=', $from);
+                })
+                ->when($request->to, function ($query, $to){
+                    $query->where('created_at', '<=', $to);
+                })
+                ->paginate()->appends(['search' => $request->search])
+            ;
+            return DishResource::collection($dishes);
+        });
     }
 
     /**
@@ -59,6 +68,7 @@ class DishController extends Controller
             ];
         }
         $dish->ingredients()->attach($attach);
+        Cache::tags('dish')->flush();
         return DishResource::make($dish->load('ingredients'));
     }
 
@@ -70,7 +80,10 @@ class DishController extends Controller
      */
     public function show(Dish $dish)
     {
-        return DishResource::make($dish->load('ingredients'));
+        $cache = 'dish.'.$dish->id;
+        return Cache::tags('dish')->remember($cache, 5000, function () use ($dish){
+            return DishResource::make($dish->load('ingredients'));
+        });
     }
 
     /**
@@ -96,6 +109,7 @@ class DishController extends Controller
             ];
         }
         $dish->ingredients()->sync($sync);
+        Cache::tags('dish')->flush();
         return DishResource::make($dish->load('ingredients'));
     }
 
@@ -109,6 +123,7 @@ class DishController extends Controller
     public function destroy(Dish $dish)
     {
         $dish->delete();
+        Cache::tags('dish')->flush();
         return ['status' => 'ok'];
     }
 }

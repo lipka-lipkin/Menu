@@ -13,6 +13,12 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MenuController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Menu::class);
+    }
+
     /**
      * Display a listing of the resource.
      *

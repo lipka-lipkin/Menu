@@ -13,6 +13,12 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class IngredientController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Ingredient::class);
+    }
+
     /**
      * Display a listing of the resource.
      *

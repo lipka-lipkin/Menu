@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable, HasApiTokens;
 
@@ -42,5 +42,15 @@ class User extends Authenticatable
     {
         $this->token = $this->createToken('authToken')->accessToken;
         return $this;
+    }
+
+    public function permission()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
+    public function getPermission($permission)
+    {
+        return $this->permission()->where('name', $permission)->exists();
     }
 }
