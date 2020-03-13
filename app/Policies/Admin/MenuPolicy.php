@@ -2,7 +2,6 @@
 
 namespace App\Policies\Admin;
 
-use App\Menu;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 

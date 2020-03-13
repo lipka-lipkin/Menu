@@ -18,9 +18,7 @@ class IngredientPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->getPermission('index_ingredient')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('index_ingredient');
     }
 
     /**
@@ -31,9 +29,7 @@ class IngredientPolicy
      */
     public function create(User $user)
     {
-        return $user->getPermission('store_ingredient')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('store_ingredient');
 
     }
 
@@ -45,9 +41,7 @@ class IngredientPolicy
      */
     public function view(User $user)
     {
-        return $user->getPermission('show_ingredient')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('show_ingredient');
     }
 
     /**
@@ -58,9 +52,7 @@ class IngredientPolicy
      */
     public function update(User $user)
     {
-        return $user->getPermission('update_ingredient')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('update_ingredient');
     }
 
     /**
@@ -71,8 +63,6 @@ class IngredientPolicy
      */
     public function delete(User $user)
     {
-        return $user->getPermission('delete_ingredient')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('delete_ingredient');
     }
 }

@@ -18,9 +18,7 @@ class DishPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->getPermission('index_dish')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('index_dish');
     }
 
     /**
@@ -31,9 +29,7 @@ class DishPolicy
      */
     public function view(User $user)
     {
-        return $user->getPermission('show_dish')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('show_dish');
     }
 
     /**
@@ -44,9 +40,7 @@ class DishPolicy
      */
     public function create(User $user)
     {
-        return $user->getPermission('store_dish')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('store_dish');
     }
 
     /**
@@ -57,9 +51,7 @@ class DishPolicy
      */
     public function update(User $user)
     {
-        return $user->getPermission('update_dish')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('update_dish');
     }
 
     /**
@@ -70,8 +62,6 @@ class DishPolicy
      */
     public function delete(User $user)
     {
-        return $user->getPermission('delete_dish')
-            ? Response::allow()
-            : Response::deny('Forbidden');
+        return $user->getPermission('delete_dish');
     }
 }

@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('private-socket', function (){
+    return view('private-socket');
+});
