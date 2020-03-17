@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Admin\Dish;
 
-use App\Menu;
+use App\Dish;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,10 +27,10 @@ class StoreDishRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'price' => 'required|numeric',//
+            'price' => 'required|min:0.01|max:9999.99',
             'type' => [
                 'required',
-                Rule::in(Menu::$type)
+                Rule::in(Dish::$type)
             ],
             'ingredients' => 'required|array',
             'ingredients.*' => 'required|array',
@@ -39,7 +39,7 @@ class StoreDishRequest extends FormRequest
                 'integer',
                 Rule::exists('ingredients', 'id'),
             ],
-            'ingredients.*.quantity' => 'required|numeric',//
+            'ingredients.*.quantity' => 'required|integer',
             'ingredients.*.is_necessary' => 'required|boolean',
         ];
     }

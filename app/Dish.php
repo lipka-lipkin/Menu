@@ -12,6 +12,14 @@ class Dish extends Model
         'type'
     ];
 
+    public static $type = [
+        'breakfast',
+        'lunch',
+        'dinner',
+        'afternoon_snack',
+        'supper'
+    ];
+
     public function ingredients()
     {
         return $this->belongsToMany(Ingredient::class)->withPivot(['quantity', 'is_necessary']);

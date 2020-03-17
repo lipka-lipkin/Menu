@@ -39,7 +39,6 @@ class DeleteOldCsv extends Command
      */
     public function handle()
     {
-        \Log::info('DeleteOldCsv');
         $date = $this->argument('date');
         if ($date === null)
         {

@@ -31,7 +31,7 @@ class StoreIngredientRequest extends FormRequest
                 'required',
                 Rule::in(Ingredient::$units)
             ],
-            'price' => 'required|numeric|min:0.01|max:9999.99'//max and min
+            'price' => 'required|numeric|min:0.01|max:9999.99'
         ];
     }
 }

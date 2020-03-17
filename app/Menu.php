@@ -12,14 +12,6 @@ class Menu extends Model
         'title',
     ];
 
-    public static $type = [
-        'breakfast',
-        'lunch',
-        'dinner',
-        'afternoon snack',
-        'supper'
-    ];
-
     public function dishes()
     {
         return $this->belongsToMany(Dish::class);
