@@ -21,6 +21,11 @@ class DishResource extends JsonResource
             'price' => $this->price,
             'type' => $this->type,
             'ingredients' => IngredientResource::collection($this->whenLoaded('ingredients')),
+            'extra' => $this->whenPivotLoaded('dish_order', function(){
+                return [
+                    'amount' => $this->pivot->amount,
+                ];
+            }),
             'created_at' => (string) $this->created_at,
             'updated_at' => (string) $this->updated_at
         ];

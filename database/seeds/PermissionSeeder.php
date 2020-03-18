@@ -14,64 +14,64 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             [
-                'name' => 'index-ingredient',
-                'display_name' => 'список-ингредиентов',
+                'name' => 'index_ingredient',
+                'display_name' => 'список_ингредиентов',
             ],
             [
-                'name' => 'store-ingredient',
-                'display_name' => 'создание-ингредиента',
+                'name' => 'store_ingredient',
+                'display_name' => 'создание_ингредиента',
             ],
             [
-                'name' => 'show-ingredient',
-                'display_name' => 'отображение-ингредиента',
+                'name' => 'show_ingredient',
+                'display_name' => 'отображение_ингредиента',
             ],
             [
-                'name' => 'update-ingredient',
-                'display_name' => 'обновление-ингредиента',
+                'name' => 'update_ingredient',
+                'display_name' => 'обновление_ингредиента',
             ],
             [
-                'name' => 'delete-ingredient',
-                'display_name' => 'удаление-ингредиента',
+                'name' => 'delete_ingredient',
+                'display_name' => 'удаление_ингредиента',
             ],
             [
-                'name' => 'index-dish',
-                'display_name' => 'список-блюд',
+                'name' => 'index_dish',
+                'display_name' => 'список_блюд',
             ],
             [
-                'name' => 'store-dish',
-                'display_name' => 'создание-блюда',
+                'name' => 'store_dish',
+                'display_name' => 'создание_блюда',
             ],
             [
-                'name' => 'show-dish',
-                'display_name' => 'отображение-блюда',
+                'name' => 'show_dish',
+                'display_name' => 'отображение_блюда',
             ],
             [
-                'name' => 'update-dish',
-                'display_name' => 'обновление-блюда',
+                'name' => 'update_dish',
+                'display_name' => 'обновление_блюда',
             ],
             [
-                'name' => 'delete-dish',
-                'display_name' => 'удаление-блюда',
+                'name' => 'delete_dish',
+                'display_name' => 'удаление_блюда',
             ],
             [
-                'name' => 'show-menu',
-                'display_name' => 'список-ингредиента',
+                'name' => 'show_menu',
+                'display_name' => 'список_ингредиента',
             ],
             [
-                'name' => 'store-menu',
-                'display_name' => 'создание-ингредиента',
+                'name' => 'store_menu',
+                'display_name' => 'создание_ингредиента',
             ],
             [
-                'name' => 'show-menu',
-                'display_name' => 'отображение-ингредиента',
+                'name' => 'show_menu',
+                'display_name' => 'отображение_ингредиента',
             ],
             [
-                'name' => 'update-menu',
-                'display_name' => 'обновление-ингредиента',
+                'name' => 'update_menu',
+                'display_name' => 'обновление_ингредиента',
             ],
             [
-                'name' => 'delete-menu',
-                'display_name' => 'удаление-ингредиента',
+                'name' => 'delete_menu',
+                'display_name' => 'удаление_ингредиента',
             ],
         ];
 

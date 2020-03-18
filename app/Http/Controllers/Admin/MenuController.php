@@ -53,6 +53,7 @@ class MenuController extends Controller
     {
         $menu = Menu::create([
             'title' => $request->title,
+            'date' => $request->date,
         ]);
         $attach = [];
         foreach ($request->dishes as $dish)
@@ -85,6 +86,7 @@ class MenuController extends Controller
     {
         $menu->update([
             'title' => $request->title,
+            'date' => $request->date,
         ]);
         $sync = [];
         foreach ($request->dishes as $dish)

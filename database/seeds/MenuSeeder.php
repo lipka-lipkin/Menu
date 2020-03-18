@@ -18,7 +18,8 @@ class MenuSeeder extends Seeder
         foreach ($menus as $menu)
         {
             $menu = Menu::create([
-                'title' => $menu
+                'title' => $menu,
+                'date' => now()->addDays(4)
             ]);
             $menu->dishes()->sync($dishes->pluck('id'));
         }

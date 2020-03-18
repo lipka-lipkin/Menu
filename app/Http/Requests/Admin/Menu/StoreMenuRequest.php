@@ -26,6 +26,7 @@ class StoreMenuRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'date' => 'required|date_format:Y-m-d',
             'dishes' => 'required|array',
             'dishes.*' => 'required|array',
             'dishes.*.id' => [

@@ -29,4 +29,9 @@ class Dish extends Model
     {
         return $this->belongsToMany(Menu::class);
     }
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class)->withPivot('amount');
+    }
 }
