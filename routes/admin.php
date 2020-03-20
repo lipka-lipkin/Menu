@@ -6,7 +6,6 @@
 |--------------------------------------------------------------------------
 */
 
-Route::post('auth/register', 'AuthController@register');
 Route::post('auth/login', 'AuthController@login');
 
 Route::group(['middleware' => 'auth:api'], function () {

@@ -11,6 +11,12 @@
 |
 */
 
-Route::group(['middleware' => 'auth:api'], function (){
+Route::post('auth/register', 'AuthController@register');
+Route::post('auth/login', 'AuthController@login')->name('login');
+
+Route::get('email/verify/{id}/{hash}', 'VerificationController@verify')->name('verification.verify');
+Route::get('email/resend', 'VerificationController@resend')->name('verification.resend');
+
+Route::group(['middleware' => ['auth:api', 'verified']], function (){
     Route::apiResource('orders', 'OrderController');
 });
