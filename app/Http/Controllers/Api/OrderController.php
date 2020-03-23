@@ -35,52 +35,34 @@ class OrderController extends Controller
         $attachDish = [];
         $price = 0;
 
-        $dishes = Dish::whereIn('id', collect($request->dishes)->pluck('id'))
-            ->get()
-            ->keyBy('id');
-
-        $menus = Menu::whereIn('id', collect($request->dishes)->pluck('menu_id'))
-            ->get()
-            ->keyBy('id');
-
-        $ingredientsId = [];
-        $ingredientsArr = collect($request->dishes)->pluck('ingredients');
-        foreach ($ingredientsArr as $ingredientsItem){
-            foreach ($ingredientsItem as $ingredient){
-                $ingredientsId[] = $ingredient['id'];
-            }
-        }
-        $ingredients = Ingredient::whereIn('id', $ingredientsId)->get()->keyBy('id');
-
         foreach ($request->dishes as $dish) {
 
-            $menus->get($dish['menu_id'])
+            Menu::find($dish['menu_id'])
                 ->dishes()
                 ->findOrFail($dish['id']);
 
-            $dishes->get($dish['id'])
-                ->ingredients()
-                ->wherePivot('is_necessary', false)
-                ->findOrFail(
-                    collect($dish['ingredients'])->pluck('id')
-                );
+            $dishObj = Dish::find($dish['id']);
 
             foreach ($dish['ingredients'] as $ingredient) {
+
+                $dishObj->ingredients()
+                    ->wherePivot('is_necessary', false)
+                    ->findOrFail($ingredient['id']);
+
                 $attachIngredient[] = [
                     'dish_id' => $dish['id'],
                     'ingredient_id' => $ingredient['id'],
                     'amount' => $ingredient['amount']
                 ];
-                $ingredientPrice = $ingredients->get($ingredient['id']);
-                $price += $ingredientPrice->price * $ingredient['amount'];
+                $ingredientPrice = Ingredient::findOrFail($ingredient['id'])->price;
+                $price += $ingredientPrice * $ingredient['amount'];
             }
 
             $attachDish[$dish['id']] = [
                 'menu_id' => $dish['menu_id'],
                 'amount' => $dish['amount']
             ];
-            $dishPrice = $dishes->get($dish['id']);
-            $price += $dishPrice->price * $dish['amount'];
+            $price += $dishObj->price * $dish['amount'];
         }
 
         $order = $request->user()->orders()->create([
