@@ -48,6 +48,21 @@ class VerificationController extends Controller
     }
 
     /**
+     * Resend the email verification notification.
+     *
+     * @param Request $request
+     * @return array|ResponseFactory|RedirectResponse|Response
+     */
+    public function resend(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response(['message'=>'Already verified']);
+        }
+        $request->user()->sendEmailVerificationNotification();
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Mark the authenticated user's email address as verified.
      *
      * @param Request $request
@@ -72,20 +87,5 @@ class VerificationController extends Controller
         }
 
         return response(['message'=>'Successfully verified']);
-    }
-
-    /**
-     * Resend the email verification notification.
-     *
-     * @param Request $request
-     * @return array|ResponseFactory|RedirectResponse|Response
-     */
-    public function resend(Request $request)
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return response(['message'=>'Already verified']);
-        }
-        $request->user()->sendEmailVerificationNotification();
-        return ['status' => 'ok'];
     }
 }
