@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Order\OrderStoreRequest;
 use App\Http\Resources\Api\OrderResource;
 use App\Ingredient;
+use App\Menu;
 use App\Order;
 use Illuminate\Http\Request;
 
@@ -38,6 +39,10 @@ class OrderController extends Controller
             ->get()
             ->keyBy('id');
 
+        $menus = Menu::whereIn('id', collect($request->dishes)->pluck('menu_id'))
+            ->get()
+            ->keyBy('id');
+
         $ingredientsId = [];
         $ingredientsArr = collect($request->dishes)->pluck('ingredients');
         foreach ($ingredientsArr as $ingredientsItem){
@@ -49,13 +54,16 @@ class OrderController extends Controller
 
         foreach ($request->dishes as $dish) {
 
+            $menus->get($dish['menu_id'])
+                ->dishes()
+                ->findOrFail($dish['id']);
+
             $dishes->get($dish['id'])
                 ->ingredients()
                 ->wherePivot('is_necessary', false)
                 ->findOrFail(
                     collect($dish['ingredients'])->pluck('id')
-                )
-            ;
+                );
 
             foreach ($dish['ingredients'] as $ingredient) {
                 $attachIngredient[] = [
