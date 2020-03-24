@@ -37,27 +37,25 @@ class OrderController extends Controller
 
         foreach ($request->dishes as $dish) {
 
-            Menu::find($dish['menu_id'])
+            $dishObj = Menu::find($dish['menu_id'])
                 ->dishes()
                 ->findOrFail($dish['id']);
 
-            $dishObj = Dish::find($dish['id']);
+            $ingredientCol = $dishObj->ingredients()
+                ->findOrFail(collect($dish['ingredients'])
+                    ->pluck('id')
+                    ->toArray()
+                )->keyBy('id');
 
             foreach ($dish['ingredients'] as $ingredient) {
-
-                $dishObj->ingredients()
-                    ->wherePivot('is_necessary', false)
-                    ->findOrFail($ingredient['id']);
-
                 $attachIngredient[] = [
                     'dish_id' => $dish['id'],
                     'ingredient_id' => $ingredient['id'],
                     'amount' => $ingredient['amount']
                 ];
-                $ingredientPrice = Ingredient::findOrFail($ingredient['id'])->price;
+                $ingredientPrice = $ingredientCol->get($ingredient['id'])->price;
                 $price += $ingredientPrice * $ingredient['amount'];
             }
-
             $attachDish[$dish['id']] = [
                 'menu_id' => $dish['menu_id'],
                 'amount' => $dish['amount']
