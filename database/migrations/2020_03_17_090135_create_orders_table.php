@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('user_id', false, true);
             $table->decimal('price', 6, 2);
+            $table->string('status', 15)->default('pending');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')

@@ -20,6 +20,7 @@ class OrderResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'price' => $this->price,
+            'status' => $this->status,
             'dishes' => DishResource::collection($this->whenLoaded('dishes')),
             'created_at' => (string) $this->created_at,
             'updated_at' => (string) $this->updated_at
