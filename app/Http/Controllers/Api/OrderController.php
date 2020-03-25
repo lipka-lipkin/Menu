@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Dish;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Order\OrderStoreRequest;
 use App\Http\Requests\Api\Order\UpdateOrderRequest;
 use App\Http\Resources\Api\OrderResource;
-use App\Menu;
 use App\Order;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class OrderController extends Controller
@@ -16,11 +19,13 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @param Request $request
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $orders = $request->user()->orders()->paginate();
+        return OrderResource::collection($orders);
     }
 
     /**
@@ -35,18 +40,14 @@ class OrderController extends Controller
         $attachDish = [];
         $price = 0;
 
-        $menu = Menu::findOrFail(collect($request->dishes)->pluck('menu_id'))
-            ->keyBy('id');
-
         foreach ($request->dishes as $dish) {
-
-            $dishObj = $menu->get($dish['menu_id'])
-                ->dishes()
-                ->findOrFail($dish['id']);
-
-            $ingredientCol = $dishObj->ingredients()
-                ->findOrFail(collect($dish['ingredients'])->pluck('id')->toArray())
-                ->keyBy('id');
+            $dishObj = Dish::whereHas('menu', function ($query) use ($dish){
+                $query->where('date', '>', now()->addDays(config('menu.menu_expired')))
+                    ->where('id', $dish['menu_id']);
+            })->whereHas('ingredients', function ($query) use ($dish){
+                $query->where('dish_ingredient.is_necessary', false)
+                    ->whereIn('ingredient_id', collect($dish['ingredients'])->pluck('id'));
+            })->find($dish['id']);
 
             foreach ($dish['ingredients'] as $ingredient) {
                 $attachIngredient[] = [
@@ -54,7 +55,9 @@ class OrderController extends Controller
                     'ingredient_id' => $ingredient['id'],
                     'amount' => $ingredient['amount']
                 ];
-                $ingredientPrice = $ingredientCol->get($ingredient['id'])->price;
+                $ingredientPrice = $dishObj->ingredients()
+                    ->find($ingredient['id'])
+                    ->price;
                 $price += $ingredientPrice * $ingredient['amount'];
             }
             $attachDish[$dish['id']] = [
@@ -63,9 +66,8 @@ class OrderController extends Controller
             ];
             $price += $dishObj->price * $dish['amount'];
         }
-
         $order = $request->user()->orders()->create([
-            'price' => $price,
+            'price' => number_format($price, 2, '.', ''),
             'status' => 'pending'
         ]);
 
@@ -78,12 +80,14 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param Request $request
      * @param Order $order
-     * @return Response
+     * @return OrderResource
      */
-    public function show(Order $order)
+    public function show(Request $request, $order)
     {
-        //
+        $order = $request->user()->orders()->findOrFail($order);
+        return OrderResource::make($order->load('dishes'));
     }
 
     /**
@@ -104,20 +108,14 @@ class OrderController extends Controller
         $attachDish = [];
         $price = 0;
 
-        $menu = Menu::findOrFail(collect($request->dishes)->pluck('menu_id'))
-            ->keyBy('id');
-
         foreach ($request->dishes as $dish) {
-
-            $dishObj = $menu->get($dish['menu_id'])
-                ->dishes()
-                ->findOrFail($dish['id']);
-
-            $ingredientCol = $dishObj->ingredients()
-                ->findOrFail(collect($dish['ingredients'])
-                    ->pluck('id')
-                    ->toArray()
-                )->keyBy('id');
+            $dishObj = Dish::whereHas('menu', function ($query) use ($dish){
+                $query->where('date', '>', now()->addDays(config('menu.menu_expired')))
+                    ->where('id', $dish['menu_id']);
+            })->whereHas('ingredients', function ($query) use ($dish){
+                $query->where('dish_ingredient.is_necessary', false)
+                    ->whereIn('ingredient_id', collect($dish['ingredients'])->pluck('id'));
+            })->find($dish['id']);
 
             foreach ($dish['ingredients'] as $ingredient) {
                 $attachIngredient[] = [
@@ -125,7 +123,9 @@ class OrderController extends Controller
                     'ingredient_id' => $ingredient['id'],
                     'amount' => $ingredient['amount']
                 ];
-                $ingredientPrice = $ingredientCol->get($ingredient['id'])->price;
+                $ingredientPrice = $dishObj->ingredients()
+                    ->find($ingredient['id'])
+                    ->price;
                 $price += $ingredientPrice * $ingredient['amount'];
             }
             $attachDish[$dish['id']] = [
@@ -135,7 +135,7 @@ class OrderController extends Controller
             $price += $dishObj->price * $dish['amount'];
         }
         $order->update([
-            'price' => $price,
+            'price' => number_format($price, 2, '.', ''),
         ]);
 
         $order->orderIngredients()->sync($attachIngredient);
@@ -147,11 +147,17 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param Request $request
      * @param Order $order
-     * @return Response
+     * @return array|ResponseFactory|Response
      */
-    public function destroy(Order $order)
+    public function destroy(Request $request, $order)
     {
-        //
+        $order = $request->user()->orders()->findOrFail($order);
+        if ($order->status != 'pending'){
+            return ResponseHelper::validation(['status' => __('validation.attributes.payed')]);
+        }
+        $order->delete();
+        return ['status' => 'ok'];
     }
 }

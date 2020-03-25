@@ -191,5 +191,6 @@ return [
         'available'             => 'Доступно',
         'size'                  => 'Размер',
         'payed'                 => 'Оплачено',
+        'incorrect_credentials' => 'Неверные учетные данные'
     ],
 ];

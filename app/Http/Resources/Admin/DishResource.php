@@ -18,7 +18,7 @@ class DishResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'price' => $this->price,
+            'price' => number_format($this->price, 2, '.', ''),
             'type' => $this->type,
             'ingredients' => IngredientResource::collection($this->whenLoaded('ingredients')),
             'extra' => $this->whenPivotLoaded('dish_order', function(){

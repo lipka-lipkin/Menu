@@ -18,7 +18,7 @@ class IngredientResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'price' => $this->price,
+            'price' => number_format($this->price, 2, '.', ''),
             'extra' => $this->whenPivotLoaded('dish_ingredient', function(){
                 return [
                     'quantity' => $this->pivot->quantity,
